@@ -34,7 +34,7 @@ Find mdp in chain | [x] | [x]
 
 ## A optimiser
 Tache | Complexité
-- | -
+------------ | ------------
 R | ?
 Gen chains | `O = n * (k * ( O(R) + O(H) ))`
 Find h in chains | `O = n * (k * ( O(R) + O(H) ))`
