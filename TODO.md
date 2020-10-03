@@ -21,8 +21,8 @@ TODO
 
 # TODO
 ## Travail réel
-[] | Fourni par le professeur | A faire 
-- | - | -
+. | Fourni par le professeur | A faire 
+------------ | ------------ | ------------
 Gen mdp | [x]
 Store mdp | [x] 
 Find R | | [x]
