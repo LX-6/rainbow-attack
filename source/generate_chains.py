@@ -4,31 +4,32 @@ import hashlib
 import string
 import random
 
+#Set de caractères possible pour le mot de passe à trouver
 chars="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 chars_len = len(chars)
 
 #Transforme le hash en une chaîne de caractères
-def reduce(hashed):
+def reduce(hashed, length):
     i = int(hashed,16)
     passwd = ""
-    while len(passwd) < 8:
-        passwd = passwd + chars[i % chars_len]
+    while len(passwd) < 12:
+        passwd += chars[i % chars_len]
         i = i // chars_len
     return passwd
 
 #Créé une ligne en partant d'une string "head" et retourne le dernier élément de la chaine "tail"
-def create_line(hashed, nb_boucle):
-
-    for i in range(0,nb_boucle):
+def create_line(password, nb_boucle, longueur):
+    #nb_boucle == nombre de colonne de la ligne
+    for i in range(nb_boucle):
         #On hash le mot de passe
-        h = hashlib.sha256(hashed.encode('ascii')).hexdigest()
+        hashed = hashlib.sha256(password.encode('ascii')).hexdigest()
         #On applique la fonction de réduction sur le hash du mot de passe 
-        hashed = reduce(h)
+        password = reduce(hashed, longueur)
 
     #On retourne le hash du dernier password généré
-    return hashlib.sha256(hashed.encode('ascii')).hexdigest()
+    return hashlib.sha256(password.encode('ascii')).hexdigest()
 
-#Ecrit une chaine avec la tete et la queue générées précédemment
+#Ecrit une chaine avec la tete et la queue générées précédemment dans le fichier de sortie
 def write_file(head, tail, output_filename):
     with open(output_filename, "a") as output_file:
         prepared_line = head + "-" + tail + "\n"
@@ -45,8 +46,13 @@ if __name__ == "__main__":
     parser.add_argument("-l", "--line", help="Line number", type=int, default=500)
     parser.add_argument("-o", "--output", help="Output file", required=True)
     arguments = parser.parse_args()
-    
-    for i in range(arguments.line):
-        head = generate_head(8)
-        tail = create_line(head, arguments.column)
-        write_file(head, tail, arguments.output)
+
+    #On génère les chaines pour chaque longueur de mot de passe possible, ici minimum 8 et max 12 caractères
+    for length in range(8,13):
+        for i in range(arguments.line):
+            #Obtient la tete de notre chaine
+            head = generate_head(length)
+            #Obtient la queue de notre chaine
+            tail = create_line(head, arguments.column, length)
+            #Ecrit la chaine dans le fichier de sortie
+            write_file(head, tail, arguments.output)
