@@ -1,12 +1,14 @@
+#!/usr/bin/env python3
+
 import matplotlib.pyplot as plt
 from collections import Counter
+import argparse
 
 # Trace le graphe des collisions dans un fichier contenant une liste de mdp
 # Les mdp dont écris ligne par ligne
 def plotfile(filename):
     with open(filename) as file:
         data = file.readlines()
-    file.close()
 
     # Compte le nombre d'occurences d'un mdp dans un fichier
     data_count = Counter(data)
@@ -26,6 +28,7 @@ def plotfile(filename):
 
 
 if __name__ == "__main__":
-    print("Filename :")
-    filename = input()
-    plotfile(filename)
+    parser = argparse.ArgumentParser()
+    parser.add_argument("input", help="Input file")
+    arguments = parser.parse_args()
+    plotfile(arguments.input)
