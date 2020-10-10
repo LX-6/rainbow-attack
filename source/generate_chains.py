@@ -12,7 +12,7 @@ chars_len = len(chars)
 def reduce(hashed, length):
     i = int(hashed,16)
     passwd = ""
-    while len(passwd) < 12:
+    while len(passwd) < length:
         passwd += chars[i % chars_len]
         i = i // chars_len
     return passwd
