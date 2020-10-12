@@ -17,9 +17,9 @@ def reduce(hashed, length):
         i = i // chars_len
     return passwd
 
-#Créé une ligne en partant d'une string "head" et retourne le dernier élément de la chaine "tail"
-def create_line(password, nb_boucle, longueur):
-    #nb_boucle == nombre de colonne de la ligne
+#Créé une chaine en partant d'une string "head" et retourne le dernier élément de la chaine "tail"
+def create_chain(password, nb_boucle, longueur):
+    #nb_boucle == nombre de colonne de la chaine
     for i in range(nb_boucle):
         #On hash le mot de passe
         hashed = hashlib.sha256(password.encode('ascii')).hexdigest()
@@ -30,7 +30,7 @@ def create_line(password, nb_boucle, longueur):
     return hashlib.sha256(password.encode('ascii')).hexdigest()
 
 #Ecrit une chaine avec la tete et la queue générées précédemment dans le fichier de sortie
-def write_file(head, tail, output_filename):
+def write_chain_to_file(head, tail, output_filename):
     with open(output_filename, "a") as output_file:
         prepared_line = head + "-" + tail + "\n"
         output_file.write(prepared_line)
@@ -43,16 +43,16 @@ def generate_head(length):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--column", help="Column number", type=int, default=50000)
-    parser.add_argument("-l", "--line", help="Line number", type=int, default=500)
+    parser.add_argument("-ch", "--chain", help="Chains number", type=int, default=500)
     parser.add_argument("-o", "--output", help="Output file", required=True)
     arguments = parser.parse_args()
 
     #On génère les chaines pour chaque longueur de mot de passe possible, ici minimum 8 et max 12 caractères
     for length in range(8,13):
-        for i in range(arguments.line):
+        for i in range(arguments.chain):
             #Obtient la tete de notre chaine
             head = generate_head(length)
             #Obtient la queue de notre chaine
-            tail = create_line(head, arguments.column, length)
+            tail = create_chain(head, arguments.column, length)
             #Ecrit la chaine dans le fichier de sortie
-            write_file(head, tail, arguments.output)
+            write_chain_to_file(head, tail, arguments.output)
