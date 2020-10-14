@@ -23,7 +23,7 @@ def create_chain(password, nb_boucle, longueur):
     for i in range(nb_boucle):
         #On hash le mot de passe
         hashed = hashlib.sha256(password.encode('ascii')).hexdigest()
-        # print(hashed)
+        #print(hashed)
         #On applique la fonction de réduction sur le hash du mot de passe
         password = reduce(hashed, longueur)
 
