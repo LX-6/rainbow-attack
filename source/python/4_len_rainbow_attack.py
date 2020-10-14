@@ -4,7 +4,7 @@ import hashlib
 import string
 import random
 
-nb_colonne = 50000
+nb_colonne = 20
 
 #Set de caractères possible pour le mot de passe à trouver
 chars="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
@@ -21,7 +21,7 @@ def compare_hash(h, table):
         tail = get_tail(i, table)
         if tail == h :
             #print("\nTail : " + str(tail))
-            #print("\nHash : " + str(h))
+            #print("Hash : " + str(h))
             #print(i)
             return i
     return -1
@@ -39,13 +39,16 @@ def find_tail(h, table):
 
             #Si les hash sont similaires
             if search != -1:
+                #print("H precedent : " + str(h_old))
+                #print("Pass precedent : " + str(pass_old))
                 is_cracked = True
                 tail = get_tail(search, table)
                 return c, search
                 # print(str(h) + " et " + str(tail) + " sont similaires!")
             else:
                 #print(str(h) + " et " + str(tail) + " ne sont pas similaires!")
-                h = reduce_and_hash(h, taille)
+                h_old = h
+                h, pass_old = reduce_and_hash(h, taille)
             c += 1
     '''
     origin_hash = h
@@ -84,7 +87,7 @@ def find_password(i_col, i_ch, table):
 
     #On récupère la tete de notre chaine
     head = get_head(i_ch, table)
-
+    print(i_col)
     nb_boucle = nb_colonne - i_col
     longueur = len(head)
     password = head
@@ -109,11 +112,11 @@ def reduce(hashed, length):
     
 #Retourne le hash du mot de passe issu de la réduction du hash précédent
 def reduce_and_hash(hashed, length):
-    '''
+    
     password = reduce(hashed, length)
-    return hashlib.sha256(password.encode('ascii')).hexdigest()
-    '''
-    return hashlib.sha256(reduce(hashed, length).encode('ascii')).hexdigest()
+    return hashlib.sha256(password.encode('ascii')).hexdigest(), password
+    
+    #return hashlib.sha256(reduce(hashed, length).encode('ascii')).hexdigest()
 
 #Retourne le tail de la chaine correspondant l'index donné en paramètre
 def get_tail(index, table):
@@ -143,11 +146,14 @@ if __name__ == "__main__":
         indice_colonne, indice_chain = find_tail(h.split('\n')[0], table_array)
         if indice_colonne != -1 and indice_chain != -1:
             h_pass = find_password(indice_colonne, indice_chain, table_array)
+            '''
             #Verification
             if hashlib.sha256(h_pass.encode('ascii')).hexdigest() == h.split('\n')[0]:
                 print("\n[V] Le mot de passe correspondant au hash " + str(h) + " est " + str(h_pass) + "\n")
             else:
                 print("\n[X] Les hashes ne sont pas similaires\n")
+            '''
+            print("\nLe mot de passe correspondant au hash " + str(h) + " est " + str(h_pass) + "\n")
         
         else:
             print("Attack failed for " + str(h))

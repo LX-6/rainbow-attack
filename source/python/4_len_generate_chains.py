@@ -18,22 +18,26 @@ def reduce(hashed, length):
     return passwd
 
 #Créé une chaine en partant d'une string "head" et retourne le dernier élément de la chaine "tail"
-def create_chain(password, nb_boucle, longueur):
+def create_chain(password, nb_boucle, longueur, output_filename):
     #nb_boucle == nombre de colonne de la chaine
     for i in range(nb_boucle):
         #On hash le mot de passe
         hashed = hashlib.sha256(password.encode('ascii')).hexdigest()
+        write_chain_to_file(password, hashed, output_filename)
         #print(hashed)
         #On applique la fonction de réduction sur le hash du mot de passe
         password = reduce(hashed, longueur)
 
     #On retourne le hash du dernier password généré
+    #print("Password pour la ligne " + str(i) + " : " + password)
+    write_chain_to_file(password, hashlib.sha256(password.encode('ascii')).hexdigest(), output_filename)
     return hashlib.sha256(password.encode('ascii')).hexdigest()
 
 #Ecrit une chaine avec la tete et la queue générées précédemment dans le fichier de sortie
 def write_chain_to_file(head, tail, output_filename):
     with open(output_filename, "a") as output_file:
-        prepared_line = head + "-" + tail + "\n"
+        #prepared_line = head + "-" + tail + "\n"
+        prepared_line = head + "-" + tail + "|"
         output_file.write(prepared_line)
 
 #Génère un mot de passe d'une longueur donnée
@@ -54,6 +58,6 @@ if __name__ == "__main__":
         #Obtient la tete de notre chaine
         head = generate_head(length)
         #Obtient la queue de notre chaine
-        tail = create_chain(head, arguments.column, length)
+        tail = create_chain(head, arguments.column, length, "all_table.txt")
         #Ecrit la chaine dans le fichier de sortie
         write_chain_to_file(head, tail, arguments.output)
