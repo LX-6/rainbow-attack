@@ -4,8 +4,6 @@ import hashlib
 import string
 import random
 
-nb_colonne = 20
-
 #Set de caractères possible pour le mot de passe à trouver
 chars="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
 chars_len = len(chars)
@@ -26,7 +24,7 @@ def compare_hash(h, table):
             return i
     return -1
 
-def find_tail(h, table):
+def find_tail(h, table, nb_colonne):
     origin_hash = h
     len_table = len(table)
     is_cracked = False
@@ -48,7 +46,7 @@ def find_tail(h, table):
             else:
                 #print(str(h) + " et " + str(tail) + " ne sont pas similaires!")
                 h_old = h
-                h, pass_old = reduce_and_hash(h, taille)
+                h, pass_old = reduce_and_hash(h, taille, c)
             c += 1
     '''
     origin_hash = h
@@ -83,11 +81,11 @@ def find_tail(h, table):
     return -1, -1
 
 #Retourne le mot de passe correspondant au hash à cracker
-def find_password(i_col, i_ch, table):
+def find_password(i_col, i_ch, table, nb_colonne):
 
     #On récupère la tete de notre chaine
     head = get_head(i_ch, table)
-    print(i_col)
+
     nb_boucle = nb_colonne - i_col
     longueur = len(head)
     password = head
@@ -96,14 +94,13 @@ def find_password(i_col, i_ch, table):
         #On hash le mot de passe
         hashed = hashlib.sha256(password.encode('ascii')).hexdigest()
         #On applique la fonction de réduction sur le hash du mot de passe 
-        password = reduce(hashed, longueur)
+        password = reduce(hashed, longueur, int(i))
 
     return password
 
 #Transforme le hash en une chaîne de caractères
-def reduce(hashed, length):
-    i = int(hashed,16)
-
+def reduce(hashed, length, indice):
+    i = int(hashed,16)+indice
     passwd = ""
     while len(passwd) < length:
         passwd += chars[i % chars_len]
@@ -111,9 +108,9 @@ def reduce(hashed, length):
     return passwd
     
 #Retourne le hash du mot de passe issu de la réduction du hash précédent
-def reduce_and_hash(hashed, length):
+def reduce_and_hash(hashed, length, indice):
     
-    password = reduce(hashed, length)
+    password = reduce(hashed, length, indice)
     return hashlib.sha256(password.encode('ascii')).hexdigest(), password
     
     #return hashlib.sha256(reduce(hashed, length).encode('ascii')).hexdigest()
@@ -141,19 +138,21 @@ if __name__ == "__main__":
     hashes_array = read_file(arguments.hash)
     table_array = read_file(arguments.table)
 
+    nb_colonne = int(table_array.pop(0).split('\n')[0])
+
     #Pour tous les hash présents dans le fichier de hash à cracker
     for h in hashes_array:
-        indice_colonne, indice_chain = find_tail(h.split('\n')[0], table_array)
+        indice_colonne, indice_chain = find_tail(h.split('\n')[0], table_array, nb_colonne)
         if indice_colonne != -1 and indice_chain != -1:
-            h_pass = find_password(indice_colonne, indice_chain, table_array)
-            '''
+            h_pass = find_password(indice_colonne, indice_chain, table_array, nb_colonne)
+            
             #Verification
             if hashlib.sha256(h_pass.encode('ascii')).hexdigest() == h.split('\n')[0]:
                 print("\n[V] Le mot de passe correspondant au hash " + str(h) + " est " + str(h_pass) + "\n")
             else:
                 print("\n[X] Les hashes ne sont pas similaires\n")
-            '''
-            print("\nLe mot de passe correspondant au hash " + str(h) + " est " + str(h_pass) + "\n")
+            
+            #print("\nLe mot de passe correspondant au hash " + str(h) + " est " + str(h_pass) + "\n")
         
         else:
-            print("Attack failed for " + str(h))
+            print("\nAttack failed for " + str(h))
