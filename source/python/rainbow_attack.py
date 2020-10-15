@@ -5,7 +5,7 @@ import string
 import random
 
 #Set de caractères possible pour le mot de passe à trouver
-chars="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+chars = string.ascii_letters + string.digits
 chars_len = len(chars)
 
 #Retourne le contenu du fichier sous forme de tableau
