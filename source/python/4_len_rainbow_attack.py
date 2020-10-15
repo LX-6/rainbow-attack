@@ -100,7 +100,7 @@ def find_password(i_col, i_ch, table, nb_colonne):
 
 #Transforme le hash en une chaîne de caractères
 def reduce(hashed, length, indice):
-    i = int(hashed,16)+indice
+    i = int(hashed,16)
     passwd = ""
     while len(passwd) < length:
         passwd += chars[i % chars_len]
