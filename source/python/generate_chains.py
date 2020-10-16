@@ -46,8 +46,8 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-c", "--column", help="Column number", type=int, default=50000)
     parser.add_argument("-ch", "--chain", help="Chains number", type=int, default=500)
-    parser.add_argument("-mn", "--min", help="Minimum length of the password to crack", type=int, default=8)
-    parser.add_argument("-mx", "--max", help="Maximum length of the password to crack", type=int, default=12)
+    parser.add_argument("-min", "--min", help="Minimum length of the password to crack", type=int, default=8)
+    parser.add_argument("-max", "--max", help="Maximum length of the password to crack", type=int, default=12)
     parser.add_argument("-o", "--output", help="Output file", required=True)
     arguments = parser.parse_args()
 
