@@ -1,6 +1,9 @@
+#!/usr/bin/env python3
+
 import rainbowattack_util as util
 import string
 import time
+import argparse
 
 #Prend un hash à cracker en entrée et retourne le mot de passe du hash s'il est présent dans la table
 def crack_hash(r_table, hash_to_crack):
@@ -62,23 +65,35 @@ def bulk_test(table, numTests):
 		numSuccess += test(table)
 
 	print("""\n{0} out of {1} random hashes were successful!\n
-Average time per hash (including failures): {2} secs.""" \
+Average time per hash (including failures): {2} secs.\n""" \
 		.format(numSuccess, numTests, (time.time() - start) / numTests))
 
 
 if __name__ == "__main__":
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-c", "--column", help="Column number", type=int, default=1000)
+    parser.add_argument("-ch", "--chain", help="Chains number", type=int, default=5000)
+    parser.add_argument("-min", "--minimum", help="Minimum length of the password to crack", type=int, default=8)
+    parser.add_argument("-max", "--maximum", help="Maximum length of the password to crack", type=int, default=12)
+    parser.add_argument("-o", "--output", help="Output file", required=True)
+    parser.add_argument("-t", "--test", help="Number of test to perform", type=int, default=100)
+    arguments = parser.parse_args()
+
     #Set de caractères possible pour le mot de passe à trouver
     chars_set = string.ascii_letters + string.digits
-    password_len = 4
-    chain_number = 5000
-    column_number = 1000
-    output_filename = 'RainbowTable.pickle'
 
-    #Table initialisation
-    table = util.RainbowTable(password_len, chars_set, chain_number, column_number, output_filename)
+    for length in range(arguments.minimum,arguments.maximum+1):
+        print("For length " + str(length) + " :\n")
 
-    #Generate table
-    table.generate()
+        output_filename = arguments.output + '_' + str(length) + '.pickle'
+        #Initialisation de la table
+        table = util.RainbowTable(length, chars_set, arguments.chain, arguments.column, output_filename)
 
-    bulk_test(table, 100)
+        #Génération de la table
+        table.generate()
+
+        #Test de l'attaque
+        bulk_test(table, arguments.test)
+
+    
