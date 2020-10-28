@@ -40,33 +40,36 @@ def back_up_chain(r_table, hash_to_crack, password):
     #On retourne None si on a pas trouvé de correspondance
     return None
 
-#Test l'attaque sur un mot de passe généré aléatoirement
-def test(table):
-
-    password = util.generate_head(table.password_len, table.chars_set)
-    hash_to_crack = util.do_hash(password)
-    print("\nCracking password: {0}\nH(password): {1}".format(password, hash_to_crack))
-
-    cracked = crack_hash(table, hash_to_crack)
-    if cracked:
-        print("Success! Password: {0}".format(cracked))
-        return True
-    else:
-        print("Unsuccessful :(")
-        return False
-
 #Lance un nombre défini de test et affiche le résultat
-def bulk_test(table, numTests):
-	start = time.time()
-	numSuccess = 0
+def test_attack(nb_test, table):
+    #Initialisation du compteur de réussite
+    cmp_success = 0
+    start_time = time.time()
 
-	for i in range(numTests):
-		print("\nTest {0} of {1}".format(i + 1, numTests))
-		numSuccess += test(table)
+    #On réalise le nombre de test défini par l'utilisateur
+    for i in range(nb_test):
+        #On génère un mot de passe à cracker
+        pass_to_crack = util.generate_password(table.password_len, table.chars_set)
+        #On hash ce mot de passe
+        hash_to_crack = util.do_hash(pass_to_crack)
+        print("\nPassword to crack is : sha256(" + pass_to_crack + ")=" + hash_to_crack)
 
-	print("""\n{0} out of {1} random hashes were successful!\n
-Average time per hash (including failures): {2} secs.\n""" \
-		.format(numSuccess, numTests, (time.time() - start) / numTests))
+        #On attaque le hash du mot de passe que l'on vient de générer
+        pass_cracked = crack_hash(table, hash_to_crack)
+
+        #Si le mot de passe a été retrouvé
+        if pass_cracked:
+            print("[S] I found the password : " + pass_cracked)
+            #Incrémente le compteur de succès
+            cmp_success += 1
+        else:
+            print("[F] I did not find this password :(")
+    
+    #On calcule le temps écoulé depuis le début de la génération
+    duration = time.time() - start_time
+    #On affiche le résultat de tous les tests
+    print("\nResults : " + str(cmp_success) + "/" + str(nb_test) + " of crack success !")
+    print("Cracking test lasted " + str(int(duration/60)) + " minutes and " + str(round(duration%60)) + " seconds")
 
 
 if __name__ == "__main__":
@@ -84,7 +87,7 @@ if __name__ == "__main__":
     chars_set = string.ascii_letters + string.digits
 
     for length in range(arguments.minimum,arguments.maximum+1):
-        print("For length " + str(length) + " :\n")
+        print("\nFor length " + str(length) + " :\n")
 
         output_filename = arguments.output + '_' + str(length) + '.pickle'
         #Initialisation de la table
@@ -94,6 +97,6 @@ if __name__ == "__main__":
         table.generate()
 
         #Test de l'attaque
-        bulk_test(table, arguments.test)
+        test_attack(arguments.test, table)
 
     

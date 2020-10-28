@@ -16,13 +16,13 @@ class RainbowTable:
     #Génère la rainbow table et la stocke dans un fichier pickle
     def generate(self):
         #Initialisation du chrono
-        startTime = time.time()
+        start_time = time.time()
 
         #On répète pour le nombre de chaines de notre table
         for i in range(self.chain_number):
 
             #On génère le mot de passe en tête de chaine
-            head = generate_head(self.password_len, self.chars_set)
+            head = generate_password(self.password_len, self.chars_set)
 
             password = head
 
@@ -44,14 +44,13 @@ class RainbowTable:
         pickle.dump(self.table, open(self.output_filename, "wb"))
 
         #On calcule le temps écoulé depuis le début de la génération
-        elapsed = time.time() - startTime
+        duration = time.time() - start_time
 
         #On affiche à l'utilisateur la durée de la génération de la table
-        print("Done in {0} mins, {1} secs.".format(int(elapsed / 60), elapsed % 60))
-
+        print("\nTable generation lasted " + str(int(duration/60)) + " minutes and " + str(round(duration%60)) + " seconds")
 
 #Génère un mot de passe d'une longueur donnée
-def generate_head(length, chars):
+def generate_password(length, chars):
     return ''.join(random.choice(chars) for i in range(length))
 
 #Transforme le hash en une chaîne de caractères
