@@ -2,6 +2,7 @@ import time
 import random
 import hashlib
 import pickle
+from vm_test_rainbowattack_main import logger
 
 class RainbowTable:
     def __init__(self, password_len, chars_set, chain_number, column_number, output_filename):

@@ -4,7 +4,18 @@ import vm_test_rainbowattack_util as util
 import string
 import time
 import argparse
-import logging
+import logging, sys
+
+#Logger
+log_format = logging.Formatter("%(asctime)s -- %(levelname)s -- %(message)s")
+file_handler = logging.FileHandler('history.log', mode='a', encoding='UTF-8')
+console_handler = logging.StreamHandler(stream=sys.stdout)
+file_handler.setFormatter(log_format)
+console_handler.setFormatter(log_format)
+logger = logging.getLogger('Rainbow attack')
+logger.addHandler(file_handler)
+logger.addHandler(console_handler)
+logger.setLevel(logging.INFO)
 
 #Prend un hash à cracker en entrée et retourne le mot de passe du hash s'il est présent dans la table
 def crack_hash(r_table, hash_to_crack):
@@ -74,17 +85,6 @@ def test_attack(nb_test, table):
 
 
 if __name__ == "__main__":
-
-    #Logger
-    log_format = logging.Formatter("%(asctime)s -- %(levelname)s -- %(message)s")
-    file_handler = logging.FileHandler('history.log', mode='a', encoding='UTF-8')
-    console_handler = logging.StreamHandler(stream=sys.stdout)
-    file_handler.setFormatter(log_format)
-    console_handler.setFormatter(log_format)
-    logger = logging.getLogger('Rainbow attack')
-    logger.addHandler(file_handler)
-    logger.addHandler(console_handler)
-    logger.setLevel(logging.INFO)
 
     #Argparse
     parser = argparse.ArgumentParser()
