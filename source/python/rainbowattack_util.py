@@ -2,6 +2,7 @@ import time
 import random
 import hashlib
 import pickle
+import multiprocessing
 
 class RainbowTable:
     def __init__(self, password_len, chars_set, chain_number, column_number, output_filename):
@@ -13,32 +14,63 @@ class RainbowTable:
         self.column_number = column_number #Nombre de colonnes dans la table
         self.output_filename = output_filename #Nom du fichier pickle de sortie
 
+    def generate_chain(self, i):
+        table = {}
+
+        #On génère le mot de passe en tête de chaine
+        head = generate_password(self.password_len, self.chars_set)
+
+        password = head
+
+        #On répète pour le nombre de colonnes dans notre chaine
+        for j in range(self.column_number):
+            #On hash le mot de passe
+            hashed = do_hash(password)
+            #On applique la fonction de réduction sur le hash du mot de passe
+            password = reduction(hashed, self.password_len, int(j), self.chars_set)
+
+        #On stocke le dernier hash "tail" et notre mot de passe de tête dans notre dictionnaire
+        table[hashed] = head
+
+        #On affiche à l'utilisateur le nombre de chaines créées jusque là
+        if i % 1000 == 0:
+            print("Number of chains already created : " + str(i))
+
+        return table
+
     #Génère la rainbow table et la stocke dans un fichier pickle
     def generate(self):
         #Initialisation du chrono
         start_time = time.time()
 
+        pool = multiprocessing.Pool()
+        result = pool.map(self.generate_chain, range(self.chain_number))
+        pool.close()
+
+        for chain in result:
+            self.table.update(chain)
+
         #On répète pour le nombre de chaines de notre table
-        for i in range(self.chain_number):
-
-            #On génère le mot de passe en tête de chaine
-            head = generate_password(self.password_len, self.chars_set)
-
-            password = head
-
-            #On répète pour le nombre de colonnes dans notre chaine
-            for j in range(self.column_number):
-                #On hash le mot de passe
-                hashed = do_hash(password)
-                #On applique la fonction de réduction sur le hash du mot de passe
-                password = reduction(hashed, self.password_len, int(j), self.chars_set)
-
-            #On stocke le dernier hash "tail" et notre mot de passe de tête dans notre dictionnaire
-            self.table[hashed] = head
-
-            #On affiche à l'utilisateur le nombre de chaines créées jusque là
-            if i % 1000 == 0:
-                print("Number of chains already created : " + str(i))
+        # for i in range(self.chain_number):
+        #
+        #     #On génère le mot de passe en tête de chaine
+        #     head = generate_password(self.password_len, self.chars_set)
+        #
+        #     password = head
+        #
+        #     #On répète pour le nombre de colonnes dans notre chaine
+        #     for j in range(self.column_number):
+        #         #On hash le mot de passe
+        #         hashed = do_hash(password)
+        #         #On applique la fonction de réduction sur le hash du mot de passe
+        #         password = reduction(hashed, self.password_len, int(j), self.chars_set)
+        #
+        #     #On stocke le dernier hash "tail" et notre mot de passe de tête dans notre dictionnaire
+        #     self.table[hashed] = head
+        #
+        #     #On affiche à l'utilisateur le nombre de chaines créées jusque là
+        #     if i % 1000 == 0:
+        #         print("Number of chains already created : " + str(i))
 
         #On écrit la représentation pickle de l'objet "table" dans le fichier de sortie
         pickle.dump(self.table, open(self.output_filename, "wb"))
