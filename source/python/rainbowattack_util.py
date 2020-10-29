@@ -5,7 +5,7 @@ import pickle
 
 class RainbowTable:
     def __init__(self, password_len, chars_set, chain_number, column_number, output_filename):
-        
+
         self.table = {} #Dictionnaire qui associe le mot de passe et le hash
         self.password_len = password_len #Taille des mots de passe à cracker
         self.chars_set = chars_set #Echantillon de caractères possibles pour les mots de passe à cracker
@@ -48,6 +48,22 @@ class RainbowTable:
 
         #On affiche à l'utilisateur la durée de la génération de la table
         print("\nTable generation lasted " + str(int(duration/60)) + " minutes and " + str(round(duration%60)) + " seconds")
+
+    #Lit la rainbow table depuis un fichier pickle
+    def load(self):
+        #Initialisation du chrono
+        start_time = time.time()
+        self.table = {}
+
+        print("Loading rainbow table")
+        self.table = pickle.load(open(self.output_filename, "rb"))
+        self.password_len = len(list(self.table.values())[0])
+
+        #On calcule le temps écoulé depuis le début de la lecture
+        duration = time.time() - start_time
+
+		#On affiche à l'utilisateur la durée de la lecture de la table
+        print("\nTable loading lasted " + str(duration) + " seconds")
 
 #Génère un mot de passe d'une longueur donnée
 def generate_password(length, chars):
