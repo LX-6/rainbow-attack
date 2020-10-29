@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import rainbowattack_util as util
+import vm_test_rainbowattack_util as util
 import string
 import time
 import argparse
