@@ -155,7 +155,7 @@ if __name__ == "__main__":
             #Test de l'attaque
             if arguments.loadhash:
                 #Lire les hash depuis un fichier
-                test_attack_load(arguments.inputhash, table)
+                test_attack_load(arguments.hashfile, table)
             else:
                 #Générer les hash aléatoirement
                 test_attack(arguments.test, table)
