@@ -96,7 +96,7 @@ def test_attack(nb_test, input_hash_filename, table):
             args.append(table)
 
     #On initialise le pool
-    pool = multiprocessing.Pool()
+    pool = multiprocessing.Pool(4)
     #On lance l'attaque pour tous les hashes en multiprocessing
     result = pool.map(crack_process, args)
     pool.close()
