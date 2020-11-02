@@ -3,6 +3,7 @@ import random
 import hashlib
 import pickle
 import multiprocessing
+import os
 
 class RainbowTable:
     def __init__(self, password_len, chars_set, chain_number, column_number, output_filename):
