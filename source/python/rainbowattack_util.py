@@ -43,7 +43,7 @@ class RainbowTable:
         #Initialisation du chrono
         start_time = time.time()
 
-        pool = multiprocessing.Pool()
+        pool = multiprocessing.Pool(len(os.sched_getaffinity(0)))
         result = pool.map(self.generate_chain, range(self.chain_number))
         pool.close()
 
@@ -75,6 +75,61 @@ class RainbowTable:
 
 		#On affiche à l'utilisateur la durée de la lecture de la table
         print("\nTable loading lasted " + str(round(duration)) + " seconds")
+
+class Args:
+    def __init__(self, table, hash_list=None, nb_test=None):
+
+        self.rainbow_table = table #Objet RainbowTable
+        self.hash_list = hash_list #Liste des hashes à cracker
+        self.nb_test = nb_test #Nombre de tests à effectuer
+
+    #Dunder method qui itère l'objet Args
+    def __iter__(self):
+        return ArgsIterator(self)
+
+class ArgsIterator:
+    def __init__(self, args):
+
+        self.current = 0 #Index courant
+        self.args = args #Objet Args
+
+        #Si l'objet Args ne contient pas une liste de hashes
+        if args.hash_list is None:
+            #Si l'objet Args ne contient pas un nombre de tests à effectuer
+            if args.nb_test is None:
+                #Erreur dans le paramétrage de la classe Args
+                raise ValueError
+            #Sinon le maximum d'itérations correspond au nombre de tests à effectuer
+            else:
+                self.max = args.nb_test
+                self.return_tuple = False
+        #Sinon le maximum d'itération correspond à la taille de la liste de hashes
+        else:
+            self.max = len(args.hash_list)
+            self.return_tuple = True
+
+    #Dunder method qui itère l'objet ArgsIterator
+    def __iter__(self):
+        return self
+
+    #Dunder method qui retourne l'élément à l'index courant
+    def __next__(self):
+        #Si on est arrivé au bout de l'itération
+        if self.current >= self.max:
+            raise StopIteration
+
+        #S'il faut retourner un tuple d'éléments
+        if self.return_tuple:
+            #Stocker l'index courant
+            tmp_current = self.current
+            #Avancer l'index
+            self.current += 1
+            #Retourner un tuple contenant le hash courant et l'objet RainbowTable
+            return (self.args.hash_list[tmp_current], self.args.rainbow_table)
+        #Sinon avancer l'index et retourner l'objet RainbowTable
+        else:
+            self.current += 1
+            return self.args.rainbow_table
 
 #Génère un mot de passe d'une longueur donnée
 def generate_password(length, chars):

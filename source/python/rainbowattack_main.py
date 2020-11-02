@@ -80,18 +80,14 @@ def test_attack(nb_test, input_hash_filename, table):
         with open(input_hash_filename) as f:
             hash_list = f.read().splitlines()
         f.close()
-        #On crée une liste de longueur équivalente au nombre de hashes à cracker
-        args = []
-        for hash_to_crack in hash_list:
-            args.append((hash_to_crack, table))
-    #Sinon on crée une liste de longueur équivalente au nombre de test à effectuer
+        # On crée un objet itérable de longueur équivalente au nombre de hashes à cracker
+        args = util.Args(table, hash_list=hash_list)
+    #Sinon on crée un objet itérable de longueur équivalente au nombre de test à effectuer
     else:
-        args = []
-        for i in range(nb_test):
-            args.append(table)
+        args = util.Args(table, nb_test=nb_test)
 
     #On initialise le pool
-    pool = multiprocessing.Pool()
+    pool = multiprocessing.Pool(len(os.sched_getaffinity(0)))
     #On lance l'attaque pour tous les hashes en multiprocessing
     result = pool.map(crack_process, args)
     pool.close()
@@ -147,7 +143,7 @@ def crack_process(args):
 # ====================
 
 if __name__ == "__main__":
-    
+
     arguments = parser.parse_args()
 
     #Set de caractères possible pour le mot de passe à trouver
@@ -161,15 +157,15 @@ if __name__ == "__main__":
         table.load()
 
         test_attack(arguments.generate, arguments.importhash, table)
-    
+
     else:
         #On répète l'opération pour toutes les tailles de mot de passe indiqué par l'utilisateur
         for length in range(arguments.range[0], arguments.range[1]+1):
-            
+
             print("\nFor length " + str(length) + " :\n")
 
             output_filename = 'RainbowTable_' + str(length) + '.pickle'
-            
+
             #Initialisation de la table
             table = util.RainbowTable(length, chars_set, arguments.size[1], arguments.size[0], output_filename)
 
