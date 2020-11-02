@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-import rainbowattack_util as util
+import vm_test_rainbowattack_util as util
 import string
 import time
 import argparse
@@ -64,24 +64,21 @@ def test_attack_process(table):
 
     #Si le mot de passe a été retrouvé
     if pass_cracked:
-        logger.info("\nPassword to crack is : sha256(" + pass_to_crack + ")=" + hash_to_crack)
+        #logger.info("\nPassword to crack is : sha256(" + pass_to_crack + ")=" + hash_to_crack)
         logger.info("[S] I found the password : " + pass_cracked)
         #Incrémente le compteur de succès
         return 1
-    else:
-        logger.info("\nPassword to crack is : sha256(" + pass_to_crack + ")=" + hash_to_crack)
-        logger.info("[F] I did not find this password :(")
 
 #Lance un nombre défini de test et affiche le résultat
 def test_attack(nb_test, table):
     #Initialisation du compteur de réussite
     cmp_success = 0
     start_time = time.time()
-
+    logger.info("Avant ajout tableau")
     args = []
     for i in range(nb_test):
         args.append(table)
-
+    logger.info("Après ajout tableau")
     #On réalise le nombre de test défini par l'utilisateur
     pool = multiprocessing.Pool()
     result = pool.map(test_attack_process, args)

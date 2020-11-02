@@ -34,7 +34,7 @@ class RainbowTable:
         table[hashed] = head
 
         #On affiche à l'utilisateur le nombre de chaines créées jusque là
-        if i % 1000 == 0:
+        #if i % 1000 == 0:
             #logger.info("Number of chains already created : " + str(i))
 
         return table
