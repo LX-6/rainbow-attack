@@ -50,28 +50,6 @@ class RainbowTable:
         for chain in result:
             self.table.update(chain)
 
-        #On répète pour le nombre de chaines de notre table
-        # for i in range(self.chain_number):
-        #
-        #     #On génère le mot de passe en tête de chaine
-        #     head = generate_password(self.password_len, self.chars_set)
-        #
-        #     password = head
-        #
-        #     #On répète pour le nombre de colonnes dans notre chaine
-        #     for j in range(self.column_number):
-        #         #On hash le mot de passe
-        #         hashed = do_hash(password)
-        #         #On applique la fonction de réduction sur le hash du mot de passe
-        #         password = reduction(hashed, self.password_len, int(j), self.chars_set)
-        #
-        #     #On stocke le dernier hash "tail" et notre mot de passe de tête dans notre dictionnaire
-        #     self.table[hashed] = head
-        #
-        #     #On affiche à l'utilisateur le nombre de chaines créées jusque là
-        #     if i % 1000 == 0:
-        #         print("Number of chains already created : " + str(i))
-
         #On écrit la représentation pickle de l'objet "table" dans le fichier de sortie
         pickle.dump(self.table, open(self.output_filename, "wb"))
 
@@ -89,13 +67,14 @@ class RainbowTable:
 
         print("Loading rainbow table")
         self.table = pickle.load(open(self.output_filename, "rb"))
+        #On récupère la longueur du mot de passe head de la première chaine
         self.password_len = len(list(self.table.values())[0])
 
         #On calcule le temps écoulé depuis le début de la lecture
         duration = time.time() - start_time
 
 		#On affiche à l'utilisateur la durée de la lecture de la table
-        print("\nTable loading lasted " + str(duration) + " seconds")
+        print("\nTable loading lasted " + str(round(duration)) + " seconds")
 
 #Génère un mot de passe d'une longueur donnée
 def generate_password(length, chars):
@@ -103,14 +82,15 @@ def generate_password(length, chars):
 
 #Transforme le hash en une chaîne de caractères
 def reduction(hashed, length, i_col, chars):
+    chars_number = len(chars)
     #On génère une clé à partir du hash et de l'indice de la colonne
-    key = (int(hashed[:9], 16) ^ i_col) % (len(chars) ** length)
+    key = (int(hashed[:9], 16) ^ i_col) % (chars_number ** length)
     password = ""
     #On itère pour la taille du mot de passe souhaité
     for i in range(length):
         #On ajoute le caractère qui correspond à l'indice dans notre set de caractères
-        password += chars[key % len(chars)]
-        key //= len(chars)
+        password += chars[key % chars_number]
+        key //= chars_number
     return password
 
 #Retourne le hash sha256 de la chaine de caractères passées en paramètre

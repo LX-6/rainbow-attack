@@ -1,10 +1,37 @@
 #!/usr/bin/env python3
+#title          :rainbowattack_main.py
+#description    :Rainbow attack script for sha256 hash function
+#author         :Jonathan Chabaud & Alexis Chemin
+#date           :October 2020
+#version        :1.0
+#usage          :python3 rainbowattack_main.py -h
+#python version :3.8.1
 
 import rainbowattack_util as util
 import string
 import time
 import argparse
 import multiprocessing
+
+# ====================
+#       ARGUMENTS
+# ====================
+
+parser = argparse.ArgumentParser()
+
+parser.add_argument("-r", "--range", help="Length range of the password to crack. -r {minimum length} {maximum length}", nargs=2, type=int, default=[8,8])
+parser.add_argument("-s", "--size", help="Size of the table. -s {column number} {chain number}", nargs=2, type=int, default=[1000,5000])
+parser.add_argument("-l", "--load", help="Load an external rainbow table. -l {rainbow table}")
+
+#Seul l'un de ses arguments peut être passé
+group = parser.add_mutually_exclusive_group()
+group.add_argument("-i", "--importhash", help="Import hashes to crack file. -i {hashes file}")
+group.add_argument("-g", "--generate", help="Generate a number of hash to crack. -g {number of hash to crack}", type=int, default=100)
+
+
+# ====================
+#       FUNCTIONS
+# ====================
 
 #Prend un hash à cracker en entrée et retourne le mot de passe du hash s'il est présent dans la table
 def crack_hash(r_table, hash_to_crack):
@@ -41,56 +68,36 @@ def back_up_chain(r_table, hash_to_crack, password):
     #On retourne None si on a pas trouvé de correspondance
     return None
 
-def test_attack_process(table):
-    #On génère un mot de passe à cracker
-    pass_to_crack = util.generate_password(table.password_len, table.chars_set)
-    #On hash ce mot de passe
-    hash_to_crack = util.do_hash(pass_to_crack)
-    print("\nPassword to crack is : sha256(" + pass_to_crack + ")=" + hash_to_crack)
-
-    #On attaque le hash du mot de passe que l'on vient de générer
-    pass_cracked = crack_hash(table, hash_to_crack)
-
-    #Si le mot de passe a été retrouvé
-    if pass_cracked:
-        print("[S] I found the password : " + pass_cracked)
-        #Incrémente le compteur de succès
-        return 1
-    else:
-        print("[F] I did not find this password :(")
-
 #Lance un nombre défini de test et affiche le résultat
-def test_attack(nb_test, table):
+def test_attack(nb_test, input_hash_filename, table):
     #Initialisation du compteur de réussite
     cmp_success = 0
     start_time = time.time()
 
-    args = []
-    for i in range(nb_test):
-        args.append(table)
+    #Si un fichier de hashes est passé en paramètre
+    if input_hash_filename:
+        #On lit le fichier contenant les hashes à cracker
+        with open(input_hash_filename) as f:
+            hash_list = f.read().splitlines()
+        f.close()
+        #On crée une liste de longueur équivalente au nombre de hashes à cracker
+        args = []
+        for hash_to_crack in hash_list:
+            args.append((hash_to_crack, table))
+    #Sinon on crée une liste de longueur équivalente au nombre de test à effectuer
+    else:
+        args = []
+        for i in range(nb_test):
+            args.append(table)
 
-    #On réalise le nombre de test défini par l'utilisateur
+    #On initialise le pool
     pool = multiprocessing.Pool()
-    result = pool.map(test_attack_process, args)
+    #On lance l'attaque pour tous les hashes en multiprocessing
+    result = pool.map(crack_process, args)
     pool.close()
 
-    # for i in range(nb_test):
-    #     #On génère un mot de passe à cracker
-    #     pass_to_crack = util.generate_password(table.password_len, table.chars_set)
-    #     #On hash ce mot de passe
-    #     hash_to_crack = util.do_hash(pass_to_crack)
-    #     print("\nPassword to crack is : sha256(" + pass_to_crack + ")=" + hash_to_crack)
-    #
-    #     #On attaque le hash du mot de passe que l'on vient de générer
-    #     pass_cracked = crack_hash(table, hash_to_crack)
-    #
-    #     #Si le mot de passe a été retrouvé
-    #     if pass_cracked:
-    #         print("[S] I found the password : " + pass_cracked)
-    #         #Incrémente le compteur de succès
-    #         cmp_success += 1
-    #     else:
-    #         print("[F] I did not find this password :(")
+    #On récupère le nimbre de succès
+    cmp_success = len(list(filter(None, result)))
 
     #On calcule le temps écoulé depuis le début de l'attaque
     duration = time.time() - start_time
@@ -98,117 +105,76 @@ def test_attack(nb_test, table):
     print("\nResults : " + str(cmp_success) + "/" + str(nb_test) + " of crack success !")
     print("Cracking test lasted " + str(int(duration/60)) + " minutes and " + str(round(duration%60)) + " seconds")
 
-def test_attack_load_process(args):
-    hash_to_crack, table = args
+#Crack le hash passé en paramètre, crée et crack un hash généré si aucun hash n'est passé en paramètre
+def crack_process(args):
 
-    print("\nHash to crack is : " + hash_to_crack)
+    #On essaie de récupérer le hash à cracker
+    try:
+        hash_to_crack, table = args
+        pass_to_crack = None
+    #S'il n'a pas été passé en argument nous le générons
+    except:
+        table = args
+        #On génère un mot de passe à cracker
+        pass_to_crack = util.generate_password(table.password_len, table.chars_set)
+        #On hash ce mot de passe
+        hash_to_crack = util.do_hash(pass_to_crack)
 
-    #On attaque le hash
+    #On attaque le hash du mot de passe que l'on vient de générer
     pass_cracked = crack_hash(table, hash_to_crack)
 
     #Si le mot de passe a été retrouvé
     if pass_cracked:
-        print("[S] I found the password : " + pass_cracked)
+        #Si le mot de passe a été généré on l'affiche pour vérifier que l'opération a bien fonctionné
+        if pass_to_crack:
+            print("\nPassword to crack is : sha256(" + pass_to_crack + ")=" + hash_to_crack)
+            print("[S] I found the password : " + pass_cracked)
+        else:
+            print("\nHash to crack is : " + hash_to_crack)
+            print("[S] I found the password : " + pass_cracked)
         #Incrémente le compteur de succès
         return 1
     else:
-        print("[F] I did not find this password :(")
+        if pass_to_crack:
+            print("\nPassword to crack is : sha256(" + pass_to_crack + ")=" + hash_to_crack)
+            print("[F] I did not find this password :(")
+        else:
+            print("\nHash to crack is : " + hash_to_crack)
+            print("[F] I did not find this password :(")
 
-#Teste des hash fournis en entrée et affiche le résultat
-def test_attack_load(input_hash_filename, table):
-    #Initialisation du compteur de réussite
-    cmp_success = 0
-    start_time = time.time()
-
-    #On lit le fichier contenant les hash à cracker
-    with open(input_hash_filename) as f:
-        hash_list = f.read().splitlines()
-    f.close()
-
-    args = []
-    for hash_to_crack in hash_list:
-        args.append((hash_to_crack, table))
-
-    pool = multiprocessing.Pool()
-    result = pool.map(test_attack_load_process, args)
-    pool.close()
-
-    cmp_success = len(list(filter(None, result)))
-
-    # #Pour chaque hash à cracker dans le fichier
-    # for hash_to_crack in hash_list:
-    #     print("\nHash to crack is : " + hash_to_crack)
-    #
-    #     #On attaque le hash
-    #     pass_cracked = crack_hash(table, hash_to_crack)
-    #
-    #     #Si le mot de passe a été retrouvé
-    #     if pass_cracked:
-    #         print("[S] I found the password : " + pass_cracked)
-    #         #Incrémente le compteur de succès
-    #         cmp_success += 1
-    #     else:
-    #         print("[F] I did not find this password :(")
-
-    #On calcule le temps écoulé depuis l'attaque
-    duration = time.time() - start_time
-    #On affiche le résultat de tous les tests
-    print("\nResults : " + str(cmp_success) + "/" + str(len(hash_list)) + " of crack success !")
-    print("Cracking test lasted " + str(int(duration/60)) + " minutes and " + str(round(duration%60)) + " seconds")
-
+# ====================
+#       MAIN
+# ====================
 
 if __name__ == "__main__":
-
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-l", "--loadtable", help="Load an external rainbow table", action="store_true")
-    parser.add_argument("-lh", "--loadhash", help="Perform tests with hash from a file", action="store_true")
-    parser.add_argument("-c", "--column", help="Column number", type=int, default=1000)
-    parser.add_argument("-ch", "--chain", help="Chains number", type=int, default=5000)
-    parser.add_argument("-min", "--minimum", help="Minimum length of the password to crack", type=int, default=8)
-    parser.add_argument("-max", "--maximum", help="Maximum length of the password to crack", type=int, default=12)
-    parser.add_argument("-f", "--tablefile", help="Rainbow table pickle file", required=True)
-    parser.add_argument("-t", "--test", help="Number of test to perform", type=int, default=100)
-    parser.add_argument("-hf", "--hashfile", help="Hash to crack file")
+    
     arguments = parser.parse_args()
 
     #Set de caractères possible pour le mot de passe à trouver
     chars_set = string.ascii_letters + string.digits
 
-    if arguments.loadtable:
+    if arguments.load:
         #Initialisation de la table
-        table = util.RainbowTable(arguments.minimum, chars_set, arguments.chain, arguments.column, arguments.tablefile)
+        table = util.RainbowTable(None, chars_set, arguments.size[1], arguments.size[0], arguments.load)
 
         #Chargement de la table
         table.load()
 
-        #Test de l'attaque
-        if arguments.loadhash:
-            #Lire les hash depuis un fichier
-            try:
-                if arguments.hashfile is None:
-                    raise ValueError
-                test_attack_load(arguments.hashfile, table)
-            except ValueError:
-                print("Please specify argument --hashfile (-h for help)")
-        else:
-            #Générer les hash aléatoirement
-            test_attack(arguments.test, table)
-
+        test_attack(arguments.generate, arguments.importhash, table)
+    
     else:
-        for length in range(arguments.minimum, arguments.maximum+1):
+        #On répète l'opération pour toutes les tailles de mot de passe indiqué par l'utilisateur
+        for length in range(arguments.range[0], arguments.range[1]+1):
+            
             print("\nFor length " + str(length) + " :\n")
 
-            output_filename = arguments.tablefile + '_' + str(length) + '.pickle'
+            output_filename = 'RainbowTable_' + str(length) + '.pickle'
+            
             #Initialisation de la table
-            table = util.RainbowTable(length, chars_set, arguments.chain, arguments.column, output_filename)
+            table = util.RainbowTable(length, chars_set, arguments.size[1], arguments.size[0], output_filename)
 
             #Génération de la table
             table.generate()
 
-            #Test de l'attaque
-            if arguments.loadhash:
-                #Lire les hash depuis un fichier
-                test_attack_load(arguments.hashfile, table)
-            else:
-                #Générer les hash aléatoirement
-                test_attack(arguments.test, table)
+            #Attaque des hashes
+            test_attack(arguments.generate, arguments.importhash, table)
