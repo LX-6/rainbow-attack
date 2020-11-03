@@ -3,14 +3,19 @@ Implement an attack on password tables with a rainbow table for academic purpose
 
 This implementation use multiprocessing to improve performance. It is using also pickle protocols for serializing and de-serializing of Python object structure to reduce table file size.
 
-Architecture :
+### Architecture :
 
 rainbowattack_main.py :
 
 rainbowattack_util.py :
 
+### Installation :
 
-Usage :
+```bash
+pip install -r requirements.txt
+```
+
+### Usage :
 
 From rainbow-attack/ directory :
 
