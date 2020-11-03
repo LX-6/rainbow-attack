@@ -29,3 +29,4 @@ python3 source/python/rainbowattack_main.py -r 6 6 -s 5000 10000000 -l RainbowTa
 ```bash
 python3 source/python/rainbowattack_main.py -r 8 12 -s 1000 10000000 -i hash_to_crack.txt
 ```
+A table for each password length will be created.
