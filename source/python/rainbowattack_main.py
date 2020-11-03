@@ -12,7 +12,6 @@ import string
 import time
 import argparse
 import multiprocessing
-import os
 
 # ====================
 #       ARGUMENTS
@@ -88,7 +87,7 @@ def test_attack(nb_test, input_hash_filename, table):
         args = util.Args(table, nb_test=nb_test)
 
     #On initialise le pool
-    pool = multiprocessing.Pool(len(os.sched_getaffinity(0)))
+    pool = multiprocessing.Pool()
     #On lance l'attaque pour tous les hashes en multiprocessing
     result = pool.map(crack_process, args)
     pool.close()
@@ -165,7 +164,7 @@ if __name__ == "__main__":
 
             print("\nFor length " + str(length) + " :\n")
 
-            output_filename = 'RainbowTable_' + str(length) + '.pickle'
+            output_filename = '../../results/RainbowTable_' + str(length) + '.pickle'
 
             #Initialisation de la table
             table = util.RainbowTable(length, chars_set, arguments.size[1], arguments.size[0], output_filename)

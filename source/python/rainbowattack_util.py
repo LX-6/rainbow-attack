@@ -3,7 +3,6 @@ import random
 import hashlib
 import pickle
 import multiprocessing
-import os
 
 class RainbowTable:
     def __init__(self, password_len, chars_set, chain_number, column_number, output_filename):
@@ -44,7 +43,7 @@ class RainbowTable:
         #Initialisation du chrono
         start_time = time.time()
 
-        pool = multiprocessing.Pool(len(os.sched_getaffinity(0)))
+        pool = multiprocessing.Pool()
         result = pool.map(self.generate_chain, range(self.chain_number))
         pool.close()
 
