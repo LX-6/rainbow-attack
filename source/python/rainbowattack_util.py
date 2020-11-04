@@ -1,3 +1,11 @@
+#!/usr/bin/env python3
+#title          :rainbowattack_util.py
+#description    :Utility methods and classes for Rainbow attack
+#author         :Jonathan Chabaud & Alexis Chemin
+#date           :October 2020
+#version        :1.0
+#python version :3.8.1
+
 import time
 import random
 import hashlib

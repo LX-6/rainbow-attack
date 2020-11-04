@@ -1,13 +1,30 @@
 # rainbow-attack
 Implement an attack on password tables with a rainbow table for academic purpose.
 
-This implementation use multiprocessing to improve performance. It is using also pickle protocols for serializing and de-serializing of Python object structure to reduce table file size.
+This implementation uses multiprocessing to improve performance. It is also using pickle's serializing and de-serializing protocols for Python objects, to store and limit the table file size.
 
 ### Architecture :
 
 rainbowattack_main.py :
+- Main script : Generates or loads a Rainbow table and performs an auto-generated test or attacks a list of hashes provided by the user.
+- test_attack : Performs an attack on a set of hashes using a Rainbow table
+- crack_process : Parallelized process performing an attack on one of the hashes from the attack set
+- crack_hash : Cracks an hash using a Rainbow table
+- back_up_chain : Finds the password corresponding to an hash in a Rainbow table
 
 rainbowattack_util.py :
+- RainbowTable : Class representing a Rainbow table
+  - generate : Generates a Rainbow table
+  - generate_chain : Generates one of the chains of the Rainbow table
+  - load : Loads a Rainbow table
+- Args : Iterable representing data necessary to perform an attack
+  - __iter__ : Iterates the set of data
+- ArgsIterator : Iterator for Args Iterable
+  - __iter__ : Iterates the set of data
+  - __next__ : Returns data at the current index
+- generate_password : Generates a plain-text according to a password policy
+- reduction : Transforms a sha256 hash into a plain-text according to a password policy
+- do_hash : Hashes a plain-text using sha256 hashing protocol
 
 ### Installation :
 
