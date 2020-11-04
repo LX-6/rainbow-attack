@@ -80,6 +80,7 @@ def test_attack(nb_test, input_hash_filename, table):
         with open(input_hash_filename) as f:
             hash_list = f.read().splitlines()
         f.close()
+        nb_test = len(hash_list)
         # On crée un objet itérable de longueur équivalente au nombre de hashes à cracker
         args = util.Args(table, hash_list=hash_list)
     #Sinon on crée un objet itérable de longueur équivalente au nombre de test à effectuer
@@ -97,6 +98,7 @@ def test_attack(nb_test, input_hash_filename, table):
 
     #On calcule le temps écoulé depuis le début de l'attaque
     duration = time.time() - start_time
+    
     #On affiche le résultat de tous les tests
     print("\nResults : " + str(cmp_success) + "/" + str(nb_test) + " of crack success !")
     print("Cracking test lasted " + str(int(duration/60)) + " minutes and " + str(round(duration%60)) + " seconds")
