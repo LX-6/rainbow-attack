@@ -7,23 +7,23 @@ We currently use it to crack sha256 hashes but you can change the hash function 
 
 ### Architecture :
 
-rainbowattack_main.py :
+**rainbowattack_main.py:**
 - Main script : Generates or loads a Rainbow table and performs an auto-generated test or attacks a list of hashes provided by the user.
 - test_attack : Performs an attack on a set of hashes using a Rainbow table
 - crack_process : Parallelized process performing an attack on one of the hashes from the attack set
 - crack_hash : Cracks an hash using a Rainbow table
 - back_up_chain : Finds the password corresponding to an hash in a Rainbow table
 
-rainbowattack_util.py :
+**rainbowattack_util.py:**
 - RainbowTable : Class representing a Rainbow table
   - generate : Generates a Rainbow table
   - generate_chain : Generates one of the chains of the Rainbow table
   - load : Loads a Rainbow table
 - Args : Iterable representing data necessary to perform an attack
-  - __iter__ : Iterates the set of data
+  - \__iter__ : Iterates the set of data
 - ArgsIterator : Iterator for Args Iterable
-  - __iter__ : Iterates the set of data
-  - __next__ : Returns data at the current index
+  - \__iter__ : Iterates the set of data
+  - \__next__ : Returns data at the current index
 - generate_password : Generates a plain-text according to a password policy
 - reduction : Transforms a sha256 hash into a plain-text according to a password policy
 - do_hash : Hashes a plain-text using sha256 hashing protocol
@@ -58,7 +58,9 @@ A table for each password length will be created.
 ### Performance :
 
 The hardcoded characters set is 62 size. You can modify it line 152 in source/python/rainbowattack_main.py.
+
 To perform 60% of success you should take twice the number of possibilities.
-Example : 
+
+**Example:**
 A 6 lenght password with lowercase, uppercase and digit has 916 millions possibilities (62^6). You should create a table of at least 1832 millions passwords to perform 60% of success.
 We recommand to take the value 1000 for columns and change the number of chains to keep the crack part fast.
