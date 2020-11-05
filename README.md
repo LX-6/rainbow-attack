@@ -62,5 +62,5 @@ The hardcoded characters set is 62 size. You can modify it line 152 in source/py
 To perform 60% of success you should take twice the number of possibilities.
 
 **Example:**
-A 6 lenght password with lowercase, uppercase and digit has 916 millions possibilities (62^6). You should create a table of at least 1832 millions passwords to perform 60% of success.
+A 6 lenght password with lowercase, uppercase and digit has 56 billions possibilities (62^6). You should create a table of at least 34 billions passwords to perform 60% of success.
 We recommand to take the value 1000 for columns and change the number of chains to keep the crack part fast.
