@@ -19,8 +19,8 @@ import multiprocessing
 
 parser = argparse.ArgumentParser()
 
-parser.add_argument("-r", "--range", help="Length range of the password to crack. -r {minimum length} {maximum length}", nargs=2, type=int, default=[8,8])
-parser.add_argument("-s", "--size", help="Size of the table. -s {column number} {chain number}", nargs=2, type=int, default=[1000,5000])
+parser.add_argument("-r", "--range", help="Length range of the password to crack. -r {minimum length} {maximum length}", nargs=2, type=int, default=[5,5])
+parser.add_argument("-s", "--size", help="Size of the table. -s {column number} {chain number}", nargs=2, type=int, default=[1000,2000000])
 parser.add_argument("-l", "--load", help="Load an external rainbow table. -l {rainbow table}")
 
 #Seul l'un de ses arguments peut être passé
@@ -158,6 +158,7 @@ if __name__ == "__main__":
         #Chargement de la table
         table.load()
 
+        #Attaque des hashes
         test_attack(arguments.generate, arguments.importhash, table)
 
     else:

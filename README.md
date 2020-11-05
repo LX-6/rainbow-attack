@@ -3,6 +3,8 @@ Implement an attack on password tables with a rainbow table for academic purpose
 
 This implementation uses multiprocessing to improve performance. It is also using pickle's serializing and de-serializing protocols for Python objects, to store and limit the table file size.
 
+We currently use it to crack sha256 hashes but you can change the hash function in the do_hash function in the rainbowattack_util.py file.
+
 ### Architecture :
 
 rainbowattack_main.py :
@@ -52,3 +54,11 @@ python3 source/python/rainbowattack_main.py -r 6 6 -s 5000 10000000 -l RainbowTa
 python3 source/python/rainbowattack_main.py -r 8 12 -s 1000 10000000 -i hash_to_crack.txt
 ```
 A table for each password length will be created.
+
+### Performance :
+
+The hardcoded characters set is 62 size. You can modify it line 152 in source/python/rainbowattack_main.py.
+To perform 60% of success you should take twice the number of possibilities.
+Example : 
+A 6 lenght password with lowercase, uppercase and digit has 916 millions possibilities (62^6). You should create a table of at least 1832 millions passwords to perform 60% of success.
+We recommand to take the value 1000 for columns and change the number of chains to keep the crack part fast.

@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #title          :rainbowattack_util.py
 #description    :Utility methods and classes for Rainbow attack
 #author         :Jonathan Chabaud & Alexis Chemin
