@@ -36,6 +36,22 @@ pip install -r requirements.txt
 
 ### Usage :
 
+```bash
+usage: rainbowattack_main.py [-h] [-r RANGE RANGE] [-s SIZE SIZE] [-l LOAD] [-i IMPORTHASH | -g GENERATE]
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -r RANGE RANGE, --range RANGE RANGE
+                        Length range of the password to crack. -r {minimum length} {maximum length}
+  -s SIZE SIZE, --size SIZE SIZE
+                        Size of the table. -s {column number} {chain number}
+  -l LOAD, --load LOAD  Load an external rainbow table. -l {rainbow table}
+  -i IMPORTHASH, --importhash IMPORTHASH
+                        Import hashes to crack file. -i {hashes file}
+  -g GENERATE, --generate GENERATE
+                        Generate a number of hash to crack. -g {number of hash to crack}
+```
+
 From rainbow-attack/ directory :
 
 - Create a table with 1 millions chains of 1000 columns and generate 100 hashes to test the table for 8 length passwords :
