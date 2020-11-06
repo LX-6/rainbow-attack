@@ -1,5 +1,7 @@
 # rainbow-attack
-Implement an attack on password tables with a rainbow table for academic purpose.
+Implement an attack on password tables with a rainbow table for academic purpose. 
+
+Made by Jonathan CHABAUD & Alexis CHEMIN for Secure software design and web security course taught in ESI.
 
 This implementation uses multiprocessing to improve performance. It is also using pickle's serializing and de-serializing protocols for Python objects, to store and limit the table file size.
 
@@ -80,3 +82,6 @@ To perform 60% of success you should take twice the number of possibilities.
 **Example:**
 A 6 lenght password with lowercase, uppercase and digit has 56 billions possibilities (62^6). You should create a table of at least 112 billions passwords to perform 60% of success.
 We recommand to take the value 1000 for columns and change the number of chains to keep the crack part fast.
+
+### Source :
+We looked at this project https://github.com/clu8/RainbowTable for the reduction function.
